@@ -4,13 +4,32 @@
 ;;
 ;; The room type is a cons with a number and a Symbol :close or :open
 
-;; Task 01
-
-
-
-;; Task 02
+(require 's)
 
 ;;; Code:
+
+;; Task 01
+
+(defun weekly-046-decrypt-region (beg end)
+  "Get region and decrypt it."
+  (interactive (if (use-region-p)
+                   (list (region-beginning) (region-end))
+                 (list (point-min) (point-min))))
+  (let* ((selection (buffer-substring-no-properties beg end))
+         (ll (mapcar #'(lambda (x) (s-split " " x)) (s-split "\n" selection))))
+    (message "%S" (apply #'concat (flatten-list (apply #'mapcar* #'weekly-046--get-duplicates ll))))))
+
+(defun weekly-046--get-duplicates (&rest list)
+  "Get duplicates from arguments LIST."
+  (let ((ht (make-hash-table :test #'equal))
+        ret)
+    (dolist (x list)
+      (incf (gethash x ht 0)))
+    (maphash (lambda (key value) (when (> value 1) (push key ret)))
+             ht)
+    ret))
+
+;; Task 02
 
 (defun weekly-046-open-door (r)
   "Opens the door of room R."
